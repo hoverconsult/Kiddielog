@@ -302,11 +302,11 @@ function approvalSheetTrigger(e) {
   if (sheet.getName() !== 'Parent_Registry') return;
   if (e.range.getColumn() !== 10) return;
 
-  const newVal = String(e.value || '').toUpperCase();
+  const newVal = String(e.value || '').trim().toUpperCase().replace(/\s+/g, '_');
   const row    = e.range.getRow();
   if (row < 2) return;
 
-  const parentCode = sheet.getRange(row, 2).getValue();
+  const parentCode = String(sheet.getRange(row, 2).getValue() || '').trim();
   if (!parentCode) return;
 
   if (newVal === 'APPROVED') {

@@ -74,6 +74,19 @@ function now_() {
 
 function normalizeCode_(c) { return String(c || '').trim().toUpperCase(); }
 
+function normalizeStatus_(status) {
+  return String(status || '').trim().toUpperCase().replace(/\s+/g, '_');
+}
+
+function isPendingApproval_(status) {
+  return normalizeStatus_(status) === 'PENDING_APPROVAL';
+}
+
+function isActiveFlag_(value) {
+  const normalized = String(value || '').trim().toUpperCase();
+  return value === true || normalized === 'TRUE' || normalized === 'YES' || normalized === '1';
+}
+
 function photoOrPlaceholder_(url, type) {
   const u = String(url || '').trim();
   if (u) return u;
@@ -130,7 +143,7 @@ function findDelegateByCode_(code) {
   const c = normalizeCode_(code);
   const data = getSheet_(SHEET_NAMES.delegates).getDataRange().getValues();
   for (let i = 1; i < data.length; i++) {
-    if (normalizeCode_(data[i][0]) === c && data[i][8] === true) {
+    if (normalizeCode_(data[i][0]) === c && isActiveFlag_(data[i][8])) {
       return {
         delegateCode:  data[i][0],
         parentCode:    data[i][1],
@@ -154,7 +167,7 @@ function getChildrenByParentCode_(parentCode) {
   const data = getSheet_(SHEET_NAMES.children).getDataRange().getValues();
   const children = [];
   for (let i = 1; i < data.length; i++) {
-    if (normalizeCode_(data[i][0]) === c && data[i][8] === true) {
+    if (normalizeCode_(data[i][0]) === c && isActiveFlag_(data[i][8])) {
       children.push({
         parentCode: data[i][0], childId: data[i][1], childName: data[i][2],
         age: data[i][3], gender: data[i][4], group: data[i][5],
@@ -171,7 +184,7 @@ function getChildrenByIds_(childIds) {
   const idSet = new Set(childIds.map(normalizeCode_));
   const children = [];
   for (let i = 1; i < all.length; i++) {
-    if (idSet.has(normalizeCode_(all[i][1])) && all[i][8] === true) {
+    if (idSet.has(normalizeCode_(all[i][1])) && isActiveFlag_(all[i][8])) {
       children.push({
         parentCode: all[i][0], childId: all[i][1], childName: all[i][2],
         age: all[i][3], gender: all[i][4], group: all[i][5],
@@ -212,7 +225,7 @@ function lookupParent(payload) {
     if (!delegate) return { ok: false, message: 'Delegate code not found. Please verify and try again.' };
     const parent = findParentByCode_(delegate.parentCode);
     if (!parent) return { ok: false, message: 'Parent linked to this delegate could not be found.' };
-    const st = String(parent.status).toUpperCase();
+    const st = normalizeStatus_(parent.status);
     if (st !== 'ACTIVE' && st !== 'APPROVED') return { ok: false, message: 'Parent account is not yet active. Please check approval status.' };
     let children = getChildrenByIds_(delegate.authorisedIds);
     if (mode === 'CHECK_OUT') {
@@ -225,7 +238,7 @@ function lookupParent(payload) {
   const parent = findParentByCode_(code);
   if (!parent) return { ok: false, message: 'Code not found. Check for typos and try again.' };
 
-  const st = String(parent.status).toUpperCase();
+  const st = normalizeStatus_(parent.status);
   if (st === 'PENDING_APPROVAL') return { ok: false, message: 'This registration is pending admin approval. You will receive an email once approved.' };
   if (st === 'REJECTED')         return { ok: false, message: 'This registration was not approved. Please contact the Children Service office.' };
   if (st === 'SUSPENDED')        return { ok: false, message: 'This account has been suspended. Please contact the Children Service office.' };
@@ -378,7 +391,7 @@ function getPendingRegistrations() {
   const pending = [];
 
   for (let i = 1; i < data.length; i++) {
-    if (String(data[i][9]).toUpperCase() !== 'PENDING_APPROVAL') continue;
+    if (!isPendingApproval_(data[i][9])) continue;
     const parentCode = data[i][1];
     const children   = getChildrenByParentCode_(parentCode);
     pending.push({
@@ -401,6 +414,13 @@ function getPendingRegistrations() {
 
 function approveRegistration(parentCode) {
   const code  = normalizeCode_(parentCode);
+  if (!code) {
+    return {
+      ok: false,
+      message: 'Parent code is required. Approve registrations from the Admin tab, or edit Reg_Status to APPROVED on a parent row.'
+    };
+  }
+
   const sheet = getSheet_(SHEET_NAMES.parents);
   const data  = sheet.getDataRange().getValues();
   const cfg   = getConfig_();
@@ -452,6 +472,13 @@ function approveRegistration(parentCode) {
 
 function rejectRegistration(parentCode, reason) {
   const code  = normalizeCode_(parentCode);
+  if (!code) {
+    return {
+      ok: false,
+      message: 'Parent code is required. Reject registrations from the Admin tab, or edit Reg_Status to REJECTED on a parent row.'
+    };
+  }
+
   const sheet = getSheet_(SHEET_NAMES.parents);
   const data  = sheet.getDataRange().getValues();
   const cfg   = getConfig_();
@@ -506,7 +533,7 @@ function registerDelegate(payload) {
   const parent = findParentByCode_(parentCode);
   if (!parent) throw new Error('Parent code not found.');
 
-  const st = String(parent.status).toUpperCase();
+  const st = normalizeStatus_(parent.status);
   if (st !== 'ACTIVE' && st !== 'APPROVED') throw new Error('Parent account must be approved before registering a delegate.');
 
   const parentChildren = getChildrenByParentCode_(parentCode);
