@@ -1,0 +1,2123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <base target="_top">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Kiddie Log - Evangel ICGC</title>
+  <style>
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --brand:   #8b1a1a;
+      --dark:    #1a0a08;
+      --gold:    #c9922a;
+      --gold-lt: #f0d080;
+      --danger:  #7a1a1a;
+      --bg:      #f5f0eb;
+      --card:    #ffffff;
+      --border:  #ddd0c0;
+      --text:    #1a0a08;
+      --muted:   #6b5040;
+      --radius:  16px;
+      --shadow: 0 6px 22px rgba(26,10,8,0.08);
+      --safe-top: env(safe-area-inset-top, 0px);
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+    }
+
+    html {
+      width: 100%;
+      min-height: 100%;
+      min-height: 100svh;
+      -webkit-text-size-adjust: 100%;
+      text-size-adjust: 100%;
+      scroll-behavior: smooth;
+    }
+
+    body {
+      width: 100%;
+      min-height: 100%;
+      min-height: 100svh;
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      overflow-x: hidden;
+      padding-bottom: calc(18px + var(--safe-bottom));
+      -webkit-font-smoothing: antialiased;
+    }
+
+    button, input, select, textarea {
+      font-family: inherit;
+    }
+
+    button, .tab-btn, .btn, label[for] {
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+    }
+
+    img {
+      max-width: 100%;
+    }
+
+    /* -- HEADER -- */
+    .site-header {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      background: linear-gradient(120deg, var(--dark) 0%, var(--brand) 100%);
+      color: #fff;
+      padding: calc(12px + var(--safe-top)) clamp(14px, 4vw, 24px) 12px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      border-bottom: 3px solid var(--gold);
+    }
+
+    .site-header img#logoImg {
+      height: clamp(42px, 11vw, 54px);
+      width: clamp(42px, 11vw, 54px);
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid var(--gold);
+      display: none;
+      flex-shrink: 0;
+      background: rgba(255,255,255,.1);
+    }
+
+    .site-header .brand-text {
+      min-width: 0;
+    }
+
+    .site-header .brand-text h1 {
+      font-size: clamp(16px, 4.8vw, 20px);
+      font-weight: 800;
+      color: var(--gold-lt);
+      line-height: 1.15;
+      overflow-wrap: anywhere;
+    }
+
+    .site-header .brand-text p {
+      font-size: clamp(11px, 3.1vw, 13px);
+      color: rgba(240,208,128,0.78);
+      margin-top: 3px;
+      line-height: 1.25;
+    }
+
+    /* -- TAB BAR -- */
+    .tab-bar {
+      position: sticky;
+      top: calc(67px + var(--safe-top));
+      z-index: 19;
+      background: var(--dark);
+      display: flex;
+      gap: 4px;
+      padding: 0 10px;
+      border-bottom: 2px solid var(--gold);
+      overflow-x: auto;
+      overflow-y: hidden;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+    }
+
+    .tab-bar::-webkit-scrollbar {
+      display: none;
+    }
+
+    .tab-btn {
+      min-height: 46px;
+      background: transparent;
+      border: none;
+      border-bottom: 3px solid transparent;
+      color: rgba(240,208,128,0.62);
+      padding: 12px 14px 9px;
+      font-size: clamp(12px, 3.5vw, 13px);
+      font-weight: 700;
+      cursor: pointer;
+      white-space: nowrap;
+      flex: 0 0 auto;
+    }
+
+    .tab-btn.active {
+      color: var(--gold-lt);
+      border-bottom-color: var(--gold);
+    }
+
+    .tab-btn:hover {
+      color: var(--gold-lt);
+    }
+
+    /* -- PAGES -- */
+    .page {
+      display: none;
+    }
+
+    .page.active {
+      display: block;
+    }
+
+    .wrap {
+      width: min(100%, 840px);
+      margin: 0 auto;
+      padding: clamp(14px, 4vw, 24px) clamp(12px, 4vw, 18px) calc(64px + var(--safe-bottom));
+    }
+
+    /* -- PAGE HERO -- */
+    .page-hero {
+      background: linear-gradient(120deg, var(--dark) 0%, var(--brand) 100%);
+      color: #fff;
+      border-radius: var(--radius);
+      padding: clamp(16px, 4vw, 22px);
+      margin-bottom: 14px;
+      border-left: 4px solid var(--gold);
+      box-shadow: var(--shadow);
+    }
+
+    .page-hero h2 {
+      font-size: clamp(18px, 5vw, 22px);
+      color: var(--gold-lt);
+      margin-bottom: 5px;
+      line-height: 1.2;
+    }
+
+    .page-hero p {
+      font-size: clamp(13px, 3.6vw, 14px);
+      opacity: .84;
+      line-height: 1.45;
+    }
+
+    /* -- CARDS -- */
+    .card {
+      background: var(--card);
+      border-radius: var(--radius);
+      padding: clamp(16px, 4.5vw, 22px);
+      box-shadow: var(--shadow);
+      margin-bottom: 14px;
+      border: 1px solid var(--border);
+      overflow: hidden;
+    }
+
+    .card h2 {
+      font-size: clamp(16px, 4.4vw, 18px);
+      margin-bottom: 14px;
+      color: var(--dark);
+      line-height: 1.25;
+    }
+
+    .card h3 {
+      font-size: 12px;
+      margin: 16px 0 8px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .5px;
+    }
+
+    /* -- FORM -- */
+    label {
+      font-weight: 700;
+      font-size: 13px;
+      display: block;
+      margin: 13px 0 5px;
+      color: var(--dark);
+      line-height: 1.25;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      min-height: 46px;
+      padding: 12px 13px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      font-size: 16px;
+      background: #faf7f4;
+      color: var(--text);
+      transition: border-color .2s, background .2s, box-shadow .2s;
+    }
+
+    textarea {
+      min-height: 88px;
+      resize: vertical;
+      line-height: 1.45;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      outline: none;
+      border-color: var(--gold);
+      background: #fff;
+      box-shadow: 0 0 0 3px rgba(201,146,42,0.18);
+    }
+
+    input[type="checkbox"] {
+      min-height: auto;
+      padding: 0;
+    }
+
+    /* -- BUTTONS -- */
+    .btn {
+      display: block;
+      width: 100%;
+      min-height: 48px;
+      border: none;
+      border-radius: 12px;
+      padding: 13px 16px;
+      font-size: 15px;
+      font-weight: 800;
+      cursor: pointer;
+      margin-top: 12px;
+      transition: opacity .15s, transform .1s;
+      text-align: center;
+      line-height: 1.2;
+    }
+
+    .btn:active {
+      opacity: .84;
+      transform: scale(.99);
+    }
+
+    .btn-primary { background: linear-gradient(135deg, var(--brand), #6b1010); color: #fff; border: 1px solid #6b1010; }
+    .btn-gold    { background: linear-gradient(135deg, var(--gold), #a07020); color: var(--dark); }
+    .btn-danger  { background: #5a0a0a; color: #fff; }
+    .btn-muted   { background: #ede8e0; color: var(--text); }
+    .btn-outline { background: transparent; border: 2px solid var(--gold); color: #7d5318; }
+
+    .grid2 {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      align-items: start;
+    }
+
+    /* -- IDENTITY BARS -- */
+    .identity-bar {
+      display: flex;
+      align-items: center;
+      gap: 13px;
+      padding: 12px 14px;
+      border-radius: 14px;
+      margin-bottom: 12px;
+      min-width: 0;
+    }
+
+    .parent-bar   { background: #fdf5e8; border: 1.5px solid var(--gold); }
+    .delegate-bar { background: #f5e8e8; border: 1.5px solid var(--brand); }
+
+    .identity-bar img {
+      width: 58px;
+      height: 58px;
+      border-radius: 50%;
+      object-fit: cover;
+      flex-shrink: 0;
+      background: #ede8e0;
+    }
+
+    .parent-bar img   { border: 3px solid var(--gold); }
+    .delegate-bar img { border: 3px solid var(--brand); }
+
+    .id-info {
+      min-width: 0;
+      flex: 1;
+    }
+
+    .id-info strong {
+      font-size: 15px;
+      display: block;
+      line-height: 1.25;
+      overflow-wrap: anywhere;
+    }
+
+    .id-info span {
+      font-size: 12px;
+      color: var(--muted);
+      display: block;
+      margin-top: 3px;
+      line-height: 1.35;
+      overflow-wrap: anywhere;
+    }
+
+    .badge {
+      display: inline-block;
+      font-size: 10px;
+      font-weight: 900;
+      padding: 3px 8px;
+      border-radius: 20px;
+      margin-top: 5px;
+      text-transform: uppercase;
+      letter-spacing: .5px;
+    }
+
+    .badge-gold   { background: var(--gold); color: var(--dark); }
+    .badge-red    { background: var(--brand); color: #fff; }
+    .badge-green  { background: #2a6b2a; color: #fff; }
+    .badge-orange { background: #c97020; color: #fff; }
+    .badge-grey   { background: #888; color: #fff; }
+
+    /* -- CHILD ROWS -- */
+    .child-row {
+      display: grid;
+      grid-template-columns: 34px 56px minmax(0, 1fr);
+      gap: 10px;
+      align-items: center;
+      border: 1px solid var(--border);
+      border-radius: 13px;
+      padding: 11px;
+      margin: 8px 0;
+      background: #faf7f4;
+      min-width: 0;
+    }
+
+    .child-row input[type="checkbox"] {
+      width: 24px;
+      height: 24px;
+      cursor: pointer;
+      accent-color: var(--brand);
+      justify-self: center;
+    }
+
+    .child-row img {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid var(--gold);
+      background: #ede8e0;
+    }
+
+    .cinfo {
+      min-width: 0;
+    }
+
+    .cinfo strong {
+      font-size: 15px;
+      line-height: 1.2;
+      overflow-wrap: anywhere;
+    }
+
+    .cinfo .cid {
+      font-size: 11px;
+      color: var(--muted);
+      display: block;
+      margin-top: 2px;
+      overflow-wrap: anywhere;
+    }
+
+    .cinfo small {
+      font-size: 11px;
+      color: #886655;
+      display: block;
+      margin-top: 2px;
+      line-height: 1.35;
+      overflow-wrap: anywhere;
+    }
+
+    /* -- CHILD SELECT -- */
+    .child-select-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 10px 11px;
+      margin: 8px 0;
+      background: #faf7f4;
+      min-width: 0;
+    }
+
+    .child-select-row img {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid var(--gold);
+      flex-shrink: 0;
+      background: #ede8e0;
+    }
+
+    .child-select-row input[type="checkbox"] {
+      width: 24px;
+      height: 24px;
+      accent-color: var(--brand);
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    .csname {
+      flex: 1;
+      font-size: 15px;
+      font-weight: 700;
+      overflow-wrap: anywhere;
+    }
+
+    .csid {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 2px;
+      overflow-wrap: anywhere;
+    }
+
+    /* -- PHOTO UPLOAD -- */
+    .photo-upload-wrap {
+      display: flex;
+      align-items: center;
+      gap: 13px;
+      margin-top: 7px;
+      min-width: 0;
+    }
+
+    .photo-preview {
+      width: 70px;
+      height: 70px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 3px solid var(--border);
+      flex-shrink: 0;
+      background: #ede8e0;
+      transition: border-color .2s;
+    }
+
+    .photo-preview.has-photo {
+      border-color: var(--gold);
+    }
+
+    .photo-upload-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      min-height: 44px;
+      background: #faf7f4;
+      border: 1.5px dashed var(--border);
+      border-radius: 10px;
+      padding: 10px 13px;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--muted);
+      cursor: pointer;
+      transition: border-color .2s, color .2s;
+      width: auto;
+      margin: 0;
+      line-height: 1.2;
+    }
+
+    .photo-upload-btn:hover, .photo-upload-btn.uploaded {
+      border-color: var(--gold);
+      color: #8a5a10;
+    }
+
+    .photo-upload-input {
+      display: none;
+    }
+
+    .photo-size-note {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 4px;
+      line-height: 1.3;
+    }
+
+    /* -- STATUS -- */
+    .status {
+      padding: 11px 13px;
+      border-radius: 10px;
+      margin-top: 11px;
+      font-size: 13px;
+      display: none;
+      white-space: pre-line;
+      line-height: 1.4;
+      overflow-wrap: anywhere;
+    }
+
+    .s-ok    { display: block; background: #eaf5ea; color: #1a5c1a; border: 1px solid #9dcc9d; }
+    .s-error { display: block; background: #fdecea; color: #7a1a1a; border: 1px solid #d89090; }
+    .s-info  { display: block; background: #fdf8ec; color: #7a4a10; border: 1px solid #e8c880; }
+
+    /* -- CODE DISPLAY -- */
+    .code-display {
+      text-align: center;
+      background: linear-gradient(135deg, var(--dark), var(--brand));
+      color: #fff;
+      border-radius: 15px;
+      padding: clamp(20px, 6vw, 28px) 16px;
+      margin-top: 14px;
+      border: 2px solid var(--gold);
+      overflow-wrap: anywhere;
+    }
+
+    .code-display .code-label {
+      font-size: 12px;
+      color: var(--gold-lt);
+      margin-bottom: 8px;
+    }
+
+    .code-display .code-value {
+      font-size: clamp(26px, 9vw, 36px);
+      font-weight: 900;
+      letter-spacing: clamp(1px, 1vw, 4px);
+      font-family: 'Courier New', monospace;
+      color: var(--gold-lt);
+      overflow-wrap: anywhere;
+    }
+
+    .code-display .code-sub {
+      font-size: 12px;
+      opacity: .78;
+      margin-top: 10px;
+      line-height: 1.4;
+    }
+
+    /* -- ADMIN QUEUE CARDS -- */
+    .queue-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: clamp(14px, 4vw, 18px);
+      margin-bottom: 12px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .queue-card .qhead {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 10px;
+      min-width: 0;
+    }
+
+    .queue-card .qhead img {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid var(--gold);
+      flex-shrink: 0;
+      background: #ede8e0;
+    }
+
+    .queue-card .qhead .qinfo {
+      min-width: 0;
+      flex: 1;
+    }
+
+    .queue-card .qhead .qinfo strong {
+      font-size: 15px;
+      display: block;
+      line-height: 1.25;
+      overflow-wrap: anywhere;
+    }
+
+    .queue-card .qhead .qinfo span {
+      font-size: 12px;
+      color: var(--muted);
+      display: block;
+      line-height: 1.35;
+      overflow-wrap: anywhere;
+    }
+
+    .queue-card .qchildren {
+      margin: 8px 0 12px;
+    }
+
+    .queue-card .qchildren .qchild {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 0;
+      border-bottom: 1px solid #ede8e0;
+      font-size: 13px;
+      line-height: 1.35;
+      overflow-wrap: anywhere;
+    }
+
+    .queue-card .qchildren .qchild:last-child {
+      border-bottom: none;
+    }
+
+    .queue-card .qchildren .qchild img {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 1.5px solid var(--gold);
+      background: #ede8e0;
+      flex-shrink: 0;
+    }
+
+    .queue-actions {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 9px;
+    }
+
+    .queue-actions .btn {
+      margin-top: 0;
+    }
+
+    /* -- ADMIN PIN GATE -- */
+    .pin-gate {
+      text-align: center;
+      padding: clamp(24px, 7vw, 34px) 16px;
+    }
+
+    .pin-gate h2 {
+      color: var(--dark);
+      margin-bottom: 8px;
+    }
+
+    .pin-gate p {
+      color: var(--muted);
+      font-size: 13px;
+      margin-bottom: 18px;
+      line-height: 1.4;
+    }
+
+    .pin-input {
+      width: min(210px, 100%);
+      text-align: center;
+      font-size: 28px;
+      letter-spacing: 8px;
+      font-weight: 800;
+      border: 2px solid var(--gold);
+      border-radius: 12px;
+      padding: 10px;
+      margin: 0 auto 14px;
+      display: block;
+      background: #faf7f4;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 36px 16px;
+      color: var(--muted);
+    }
+
+    .empty-state .empty-icon {
+      font-size: 44px;
+      margin-bottom: 12px;
+    }
+
+    .empty-state p {
+      font-size: 14px;
+      line-height: 1.4;
+    }
+
+    hr.div {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 15px 0;
+    }
+
+    @media (max-width: 720px) {
+      .grid2 {
+        grid-template-columns: 1fr;
+        gap: 0;
+      }
+
+      .queue-actions {
+        grid-template-columns: 1fr;
+      }
+
+      .tab-bar {
+        top: calc(64px + var(--safe-top));
+      }
+    }
+
+    @media (max-width: 520px) {
+      .wrap {
+        padding-left: 10px;
+        padding-right: 10px;
+      }
+
+      .site-header {
+        gap: 10px;
+      }
+
+      .identity-bar {
+        align-items: flex-start;
+      }
+
+      .identity-bar img {
+        width: 52px;
+        height: 52px;
+      }
+
+      .child-row {
+        grid-template-columns: 34px 48px minmax(0, 1fr);
+        padding: 10px;
+      }
+
+      .child-row img {
+        width: 46px;
+        height: 46px;
+      }
+
+      .photo-upload-wrap {
+        align-items: flex-start;
+      }
+
+      .photo-preview {
+        width: 62px;
+        height: 62px;
+      }
+
+      #adminQueue > div:first-child {
+        align-items: stretch !important;
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      #adminQueue .btn {
+        width: 100% !important;
+      }
+    }
+
+    @media (max-width: 380px) {
+      .tab-btn {
+        padding-left: 11px;
+        padding-right: 11px;
+      }
+
+      .child-row {
+        grid-template-columns: 30px minmax(0, 1fr);
+      }
+
+      .child-row img {
+        display: none;
+      }
+
+      .child-select-row img {
+        width: 38px;
+        height: 38px;
+      }
+    }
+
+    @media (max-height: 620px) and (max-width: 520px) {
+      .site-header {
+        position: static;
+      }
+
+      .tab-bar {
+        position: sticky;
+        top: 0;
+      }
+    }
+
+
+    /* ===================================================
+       DATAFORMATIC COMMERCIAL MOBILE SKIN - 2026
+       Mobile-first UI polish for production deployment
+    =================================================== */
+    :root {
+      --brand: #8b1416;
+      --brand-2: #4b090a;
+      --dark: #170604;
+      --ink: #22100d;
+      --gold: #c99732;
+      --gold-2: #f3d37a;
+      --cream: #fff8ec;
+      --paper: rgba(255, 252, 246, 0.92);
+      --glass: rgba(255, 255, 255, 0.82);
+      --line: rgba(150, 104, 38, 0.22);
+      --text: #21100c;
+      --muted: #765d4c;
+      --success: #176844;
+      --danger: #861a1d;
+      --radius: 22px;
+      --shadow: 0 18px 48px rgba(44, 16, 8, 0.13);
+      --shadow-soft: 0 10px 28px rgba(44, 16, 8, 0.08);
+      --safe-top: env(safe-area-inset-top, 0px);
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+    }
+
+    html {
+      background: #140504;
+      scroll-padding-bottom: calc(96px + var(--safe-bottom));
+    }
+
+    body {
+      background:
+        radial-gradient(circle at 50% -18%, rgba(243, 211, 122, .25), transparent 34rem),
+        radial-gradient(circle at 110% 8%, rgba(139, 20, 22, .16), transparent 24rem),
+        linear-gradient(180deg, #fff8f1 0%, #f6eee7 42%, #f3ece6 100%);
+      color: var(--text);
+      letter-spacing: -0.01em;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background-image:
+        linear-gradient(rgba(139,20,22,.035) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(139,20,22,.035) 1px, transparent 1px);
+      background-size: 26px 26px;
+      mask-image: linear-gradient(to bottom, rgba(0,0,0,.5), transparent 60%);
+      z-index: 0;
+    }
+
+    .site-header, .tab-bar, .page, .df-production-footer { position: relative; z-index: 1; }
+
+    .site-header {
+      top: 0;
+      min-height: 74px;
+      padding: calc(14px + var(--safe-top)) clamp(16px, 5vw, 26px) 14px;
+      background:
+        linear-gradient(135deg, rgba(23,6,4,.98), rgba(139,20,22,.96)),
+        radial-gradient(circle at 85% 0%, rgba(243,211,122,.28), transparent 18rem);
+      box-shadow: 0 12px 28px rgba(23, 6, 4, .26);
+      border-bottom: 1px solid rgba(243,211,122,.5);
+    }
+
+    .site-header::after {
+      content: 'Dataformatic Production &copy; 2026';
+      margin-left: auto;
+      align-self: center;
+      padding: 7px 10px;
+      border: 1px solid rgba(243,211,122,.42);
+      border-radius: 999px;
+      color: rgba(243,211,122,.88);
+      background: rgba(255,255,255,.06);
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    .site-header img#logoImg {
+      width: 46px;
+      height: 46px;
+      border: 1.5px solid rgba(243,211,122,.85);
+      box-shadow: 0 0 0 4px rgba(243,211,122,.08), 0 8px 24px rgba(0,0,0,.22);
+    }
+
+    .site-header .brand-text h1 {
+      font-size: clamp(17px, 4.4vw, 22px);
+      letter-spacing: -0.025em;
+      color: #fff2c2;
+    }
+
+    .site-header .brand-text p {
+      color: rgba(255,242,194,.72);
+      font-weight: 600;
+    }
+
+    .tab-bar {
+      background: rgba(24, 7, 5, .94);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border-bottom: 1px solid rgba(243,211,122,.42);
+      box-shadow: 0 8px 18px rgba(23,6,4,.16);
+    }
+
+    .tab-btn {
+      border-radius: 999px 999px 0 0;
+      min-height: 48px;
+      color: rgba(255,242,194,.62);
+      letter-spacing: -0.01em;
+    }
+
+    .tab-btn.active {
+      color: #fff4c9;
+      background: linear-gradient(180deg, rgba(243,211,122,.13), rgba(243,211,122,.04));
+      border-bottom-color: var(--gold-2);
+    }
+
+    .wrap {
+      width: min(100%, 760px);
+      padding-top: clamp(18px, 4vw, 28px);
+    }
+
+    .page-hero {
+      position: relative;
+      overflow: hidden;
+      border: 1px solid rgba(243,211,122,.42);
+      border-left: none;
+      padding: clamp(20px, 5vw, 28px);
+      background:
+        radial-gradient(circle at 90% -10%, rgba(243,211,122,.36), transparent 12rem),
+        linear-gradient(135deg, #1a0705 0%, #5f0d0f 50%, #a21d22 100%);
+      box-shadow: 0 18px 36px rgba(77, 14, 12, .18);
+    }
+
+    .page-hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(110deg, transparent 0%, rgba(255,255,255,.12) 42%, transparent 52%);
+      transform: translateX(-120%);
+      animation: dfSheen 7s ease-in-out infinite;
+    }
+
+    @keyframes dfSheen {
+      0%, 56% { transform: translateX(-120%); }
+      72%, 100% { transform: translateX(120%); }
+    }
+
+    .page-hero h2 {
+      position: relative;
+      font-size: clamp(20px, 6vw, 28px);
+      line-height: 1.05;
+      color: #fff2c2;
+      letter-spacing: -0.045em;
+    }
+
+    .page-hero p {
+      position: relative;
+      margin-top: 7px;
+      font-size: clamp(13px, 3.6vw, 15px);
+      color: rgba(255,255,255,.84);
+      max-width: 54ch;
+      line-height: 1.45;
+    }
+
+    .card, .queue-card {
+      background: var(--paper);
+      border: 1px solid rgba(150, 104, 38, 0.22);
+      border-radius: 22px;
+      box-shadow: var(--shadow-soft);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+
+    .card { padding: clamp(18px, 4.6vw, 26px); }
+
+    .card h2 {
+      font-size: clamp(18px, 4.6vw, 22px);
+      letter-spacing: -0.035em;
+      color: var(--ink);
+      margin-bottom: 18px;
+    }
+
+    .card h3 {
+      color: #8b5f1f;
+      letter-spacing: .075em;
+      font-size: 12px;
+    }
+
+    label {
+      font-size: 13px;
+      color: #3a1a12;
+      font-weight: 800;
+      margin-bottom: 7px;
+    }
+
+    input, select, textarea {
+      min-height: 48px;
+      border-radius: 14px;
+      border: 1px solid rgba(139, 20, 22, .16);
+      background: rgba(255, 252, 247, .9);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.65);
+      color: var(--text);
+      font-size: 16px;
+    }
+
+    textarea { min-height: 96px; resize: vertical; }
+
+    input:focus, select:focus, textarea:focus {
+      outline: 3px solid rgba(201,151,50,.22);
+      border-color: rgba(201,151,50,.88);
+      background: #fff;
+    }
+
+    .btn {
+      min-height: 52px;
+      border-radius: 16px;
+      font-size: 15px;
+      letter-spacing: -0.015em;
+      box-shadow: 0 10px 22px rgba(44,16,8,.12);
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #a51b21 0%, #741014 58%, #3b0808 100%);
+      border: 1px solid rgba(255,242,194,.22);
+      color: #fff7d6;
+    }
+
+    .btn-gold {
+      background: linear-gradient(135deg, #f4d37d 0%, #c99732 52%, #9a6716 100%);
+      color: #241009;
+      border: 1px solid rgba(103, 68, 11, .28);
+    }
+
+    .btn-danger { background: linear-gradient(135deg, #8e191e, #4a080a); }
+    .btn-muted { background: rgba(226, 217, 205, .78); color: #3b2a21; box-shadow: none; }
+    .btn-outline { color: #8b5f1f; border-color: rgba(201,151,50,.86); background: rgba(255,255,255,.45); }
+
+    .grid2 { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+
+    .identity-bar {
+      border-radius: 18px;
+      padding: 14px;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.7);
+    }
+
+    .parent-bar { background: linear-gradient(135deg, rgba(255,247,226,.95), rgba(255,255,255,.9)); }
+    .delegate-bar { background: linear-gradient(135deg, rgba(255,235,232,.95), rgba(255,255,255,.9)); }
+
+    .child-row {
+      grid-template-columns: 36px 58px minmax(0, 1fr);
+      border-radius: 18px;
+      padding: 13px;
+      background: rgba(255,252,247,.9);
+      border-color: rgba(150,104,38,.2);
+    }
+
+    .child-row input[type="checkbox"], .child-select-row input[type="checkbox"] {
+      width: 24px;
+      height: 24px;
+    }
+
+    .child-row img, .child-select-row img, .photo-preview {
+      background: linear-gradient(135deg, #fff3d2, #ead9c4);
+    }
+
+    .photo-upload-wrap {
+      border: 1px dashed rgba(201,151,50,.45);
+      border-radius: 18px;
+      padding: 12px;
+      background: rgba(255,250,241,.7);
+    }
+
+    .photo-upload-btn {
+      border-radius: 14px;
+      min-height: 44px;
+      align-items: center;
+    }
+
+    .status {
+      border-radius: 16px;
+      line-height: 1.45;
+      font-weight: 700;
+    }
+
+    .s-ok { background: rgba(231,247,236,.95); color: #155d39; border-color: rgba(21,93,57,.22); }
+    .s-error { background: rgba(255,236,234,.95); color: #861a1d; border-color: rgba(134,26,29,.24); }
+    .s-info { background: rgba(255,247,226,.95); color: #7a5117; border-color: rgba(201,151,50,.28); }
+
+    .pin-input {
+      min-height: 56px;
+      border-radius: 16px;
+    }
+
+    .code-display {
+      background:
+        radial-gradient(circle at 50% -20%, rgba(243,211,122,.36), transparent 16rem),
+        linear-gradient(135deg, #1a0705, #7b1518);
+      border-radius: 24px;
+      box-shadow: 0 16px 38px rgba(44,16,8,.22);
+    }
+
+    .df-production-footer {
+      width: min(100%, 760px);
+      margin: 0 auto;
+      padding: 0 clamp(12px, 4vw, 18px) calc(88px + var(--safe-bottom));
+      color: rgba(90, 57, 41, .74);
+      font-size: 11px;
+      text-align: center;
+      letter-spacing: .05em;
+      text-transform: uppercase;
+    }
+
+    .df-production-footer strong { color: #8b1416; }
+
+    @media (max-width: 900px) {
+      .grid2 { grid-template-columns: 1fr; gap: 12px; }
+      .wrap { width: min(100%, 680px); }
+    }
+
+    @media (max-width: 720px) {
+      .site-header {
+        min-height: 70px;
+        padding-right: 14px;
+      }
+
+      .site-header::after {
+        display: none;
+      }
+
+      .tab-bar {
+        position: fixed;
+        top: auto;
+        left: 12px;
+        right: 12px;
+        bottom: calc(10px + var(--safe-bottom));
+        z-index: 50;
+        padding: 7px;
+        border: 1px solid rgba(243,211,122,.34);
+        border-radius: 24px;
+        justify-content: space-between;
+        box-shadow: 0 18px 40px rgba(23,6,4,.34);
+      }
+
+      .tab-btn {
+        flex: 1 1 0;
+        min-width: 0;
+        min-height: 54px;
+        padding: 8px 6px;
+        border-bottom: none;
+        border-radius: 18px;
+        font-size: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 3px;
+      }
+
+      .tab-btn::first-letter { font-size: 18px; }
+
+      .tab-btn.active {
+        background: linear-gradient(180deg, rgba(243,211,122,.2), rgba(139,20,22,.22));
+        border-bottom: none;
+      }
+
+      .tab-btn:nth-child(1)::after { content: 'Log'; }
+      .tab-btn:nth-child(2)::after { content: 'Delegate'; }
+      .tab-btn:nth-child(3)::after { content: 'Register'; }
+      .tab-btn:nth-child(4)::after { content: 'Admin'; }
+      .tab-btn::after {
+        font-size: 10px;
+        font-weight: 800;
+        line-height: 1;
+      }
+
+      .wrap {
+        padding-left: 14px;
+        padding-right: 14px;
+        padding-bottom: calc(112px + var(--safe-bottom));
+      }
+
+      .page-hero { border-radius: 24px; }
+      .card, .queue-card { border-radius: 24px; }
+
+      .identity-bar {
+        align-items: flex-start;
+      }
+
+      .child-row {
+        grid-template-columns: 34px 52px minmax(0, 1fr);
+        align-items: start;
+      }
+
+      .queue-card .qhead {
+        align-items: flex-start;
+      }
+
+      .queue-actions { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 430px) {
+      .site-header img#logoImg { width: 40px; height: 40px; }
+      .site-header .brand-text h1 { font-size: 16px; }
+      .site-header .brand-text p { font-size: 11px; }
+      .page-hero h2 { font-size: 22px; }
+      .card { padding: 16px; }
+      .photo-upload-wrap { align-items: flex-start; }
+      .photo-preview { width: 58px; height: 58px; }
+      .child-row { grid-template-columns: 32px 48px minmax(0, 1fr); padding: 11px; }
+      .child-row img { width: 46px; height: 46px; }
+      .pin-input { width: min(100%, 210px); }
+    }
+
+    @media (max-width: 360px) {
+      .wrap { padding-left: 10px; padding-right: 10px; }
+      .card { padding: 14px; }
+      .tab-bar { left: 8px; right: 8px; }
+      .tab-btn::after { font-size: 9px; }
+    }
+
+  
+
+    /* ===================================================
+       FINAL MOBILE NAVIGATION + RENDER QA PATCH
+       Dataformatic Production 2026
+       Purpose: Android/iOS commercial navigation feel
+    =================================================== */
+    .tab-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      line-height: 1;
+      user-select: none;
+    }
+
+    .nav-chip {
+      display: inline-grid;
+      place-items: center;
+      width: 28px;
+      height: 28px;
+      border-radius: 999px;
+      background: rgba(243, 211, 122, .10);
+      border: 1px solid rgba(243, 211, 122, .25);
+      color: #f3d37a;
+      font-size: 10px;
+      font-weight: 900;
+      letter-spacing: .04em;
+      flex: 0 0 auto;
+    }
+
+    .nav-label {
+      display: inline-block;
+      font-size: 13px;
+      font-weight: 900;
+      letter-spacing: -.02em;
+      white-space: nowrap;
+    }
+
+    .tab-btn.active .nav-chip {
+      background: linear-gradient(135deg, #f3d37a, #c99732);
+      color: #210b08;
+      border-color: rgba(255, 244, 201, .78);
+      box-shadow: 0 8px 22px rgba(201,151,50,.18);
+    }
+
+    .tab-btn:focus-visible,
+    .btn:focus-visible,
+    input:focus-visible,
+    select:focus-visible,
+    textarea:focus-visible {
+      outline: 3px solid rgba(243, 211, 122, .45);
+      outline-offset: 2px;
+    }
+
+    @media (hover: none) and (pointer: coarse) {
+      .btn, .tab-btn, input, select, textarea, .photo-upload-btn {
+        min-height: 48px;
+      }
+    }
+
+    @media (max-width: 720px) {
+      body {
+        padding-bottom: calc(118px + var(--safe-bottom));
+      }
+
+      .site-header {
+        position: sticky;
+        top: 0;
+        z-index: 40;
+      }
+
+      .tab-bar {
+        position: fixed !important;
+        left: max(10px, env(safe-area-inset-left, 0px));
+        right: max(10px, env(safe-area-inset-right, 0px));
+        bottom: calc(10px + var(--safe-bottom));
+        top: auto !important;
+        z-index: 99;
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 6px;
+        min-height: 74px;
+        padding: 8px;
+        border-radius: 28px;
+        background:
+          linear-gradient(180deg, rgba(41, 12, 9, .96), rgba(22, 5, 4, .98));
+        border: 1px solid rgba(243, 211, 122, .38);
+        box-shadow:
+          0 20px 48px rgba(23, 6, 4, .42),
+          inset 0 1px 0 rgba(255, 244, 201, .08);
+        overflow: visible;
+        -webkit-backdrop-filter: blur(18px);
+        backdrop-filter: blur(18px);
+      }
+
+      .tab-btn {
+        width: 100%;
+        min-width: 0;
+        min-height: 58px;
+        padding: 7px 4px;
+        border: 0;
+        border-radius: 21px;
+        flex: initial;
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+        color: rgba(255, 244, 201, .65);
+        background: transparent;
+        transform: translateZ(0);
+      }
+
+      .tab-btn::before,
+      .tab-btn::after,
+      .tab-btn::first-letter {
+        content: none !important;
+      }
+
+      .tab-btn.active {
+        color: #fff4c9;
+        background:
+          radial-gradient(circle at 50% 0%, rgba(243, 211, 122, .24), transparent 70%),
+          linear-gradient(180deg, rgba(139, 20, 22, .62), rgba(54, 12, 10, .86));
+        box-shadow:
+          inset 0 1px 0 rgba(255, 244, 201, .12),
+          0 10px 24px rgba(0,0,0,.18);
+      }
+
+      .nav-chip {
+        width: 31px;
+        height: 31px;
+        font-size: 10px;
+      }
+
+      .nav-label {
+        display: block;
+        max-width: 100%;
+        font-size: 10.5px;
+        line-height: 1;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .wrap,
+      .df-production-footer {
+        width: min(100%, 640px);
+      }
+
+      .df-production-footer {
+        padding-bottom: calc(106px + var(--safe-bottom));
+        font-size: 10px;
+        line-height: 1.45;
+      }
+
+      .page-hero {
+        margin-top: 4px;
+      }
+    }
+
+    @media (max-width: 390px) {
+      .tab-bar {
+        left: 7px;
+        right: 7px;
+        gap: 4px;
+        padding: 7px;
+      }
+
+      .tab-btn {
+        border-radius: 18px;
+        min-height: 56px;
+      }
+
+      .nav-chip {
+        width: 28px;
+        height: 28px;
+      }
+
+      .nav-label {
+        font-size: 9.7px;
+      }
+    }
+
+    @media (max-height: 640px) and (max-width: 720px) {
+      .tab-bar {
+        min-height: 66px;
+      }
+
+      .tab-btn {
+        min-height: 50px;
+      }
+
+      .nav-chip {
+        width: 26px;
+        height: 26px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: .01ms !important;
+        animation-iteration-count: 1 !important;
+        scroll-behavior: auto !important;
+        transition-duration: .01ms !important;
+      }
+    }
+
+  </style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="site-header">
+  <img id="logoImg" src="" alt="Logo">
+  <div class="brand-text">
+    <h1 id="headerChurchName">Kiddie Log</h1>
+    <p id="headerServiceName">Children Service Attendance</p>
+  </div>
+</header>
+
+<!-- TAB BAR -->
+<nav class="tab-bar" aria-label="Primary navigation">
+  <button class="tab-btn active" type="button" onclick="showPage('checkInOut', this)" aria-label="Check in and check out">
+    <span class="nav-chip" aria-hidden="true">IN</span>
+    <span class="nav-label">Log</span>
+  </button>
+  <button class="tab-btn" type="button" onclick="showPage('delegate', this)" aria-label="Register delegate pickup">
+    <span class="nav-chip" aria-hidden="true">DL</span>
+    <span class="nav-label">Delegate</span>
+  </button>
+  <button class="tab-btn" type="button" onclick="showPage('register', this)" aria-label="Register family">
+    <span class="nav-chip" aria-hidden="true">RG</span>
+    <span class="nav-label">Register</span>
+  </button>
+  <button class="tab-btn" type="button" onclick="showPage('admin', this)" aria-label="Admin approval queue">
+    <span class="nav-chip" aria-hidden="true">AD</span>
+    <span class="nav-label">Admin</span>
+  </button>
+</nav>
+
+<!-- ===================================================
+     PAGE 1 - CHECK-IN / CHECK-OUT
+=================================================== -->
+<div id="page-checkInOut" class="page active">
+  <div class="wrap">
+    <div class="page-hero">
+      <h2>Drop-Off &amp; Pick-Up</h2>
+      <p>Enter a parent code or delegate code to begin.</p>
+    </div>
+    <div class="card">
+      <h2>Look Up Code</h2>
+      <div class="grid2">
+        <div>
+          <label>Transaction Type</label>
+          <select id="mode">
+            <option value="CHECK_IN">Drop Off / Check-In</option>
+            <option value="CHECK_OUT">Pickup / Check-Out</option>
+          </select>
+        </div>
+        <div>
+          <label>Parent Code or Delegate Code</label>
+          <input id="codeInput" placeholder="e.g. ABC-00001 or ABC-D-00001" autocomplete="off" autocapitalize="characters" inputmode="text">
+        </div>
+      </div>
+      <button class="btn btn-primary" onclick="lookup()">Find &amp; Verify</button>
+      <div id="lookupStatus" class="status"></div>
+    </div>
+
+    <div id="resultCard" class="card" style="display:none;">
+      <h2>Confirm &amp; Submit</h2>
+      <div class="identity-bar parent-bar">
+        <img id="parentPhoto" src="" alt="Parent">
+        <div class="id-info">
+          <strong id="parentName">-</strong>
+          <span id="parentMeta"></span>
+          <span class="badge badge-gold">Parent</span>
+        </div>
+      </div>
+      <div class="identity-bar delegate-bar" id="delegateBar" style="display:none;">
+        <img id="delegatePhoto" src="" alt="Delegate">
+        <div class="id-info">
+          <strong id="delegateName">-</strong>
+          <span id="delegateMeta"></span>
+          <span class="badge badge-red">Authorised Delegate</span>
+        </div>
+      </div>
+      <hr class="div">
+      <div class="grid2">
+        <div>
+          <label>Children Service Leader</label>
+          <input id="submittedBy" placeholder="Leader's name">
+        </div>
+        <div>
+          <label>Pickup Person <span style="font-weight:400;font-size:11px;color:var(--muted)">(required on pickup)</span></label>
+          <input id="pickupPerson" placeholder="Name of person collecting">
+        </div>
+      </div>
+      <label>Notes (optional)</label>
+      <textarea id="notes" rows="2" placeholder="Any notes for this transaction"></textarea>
+      <h3>Select Children</h3>
+      <div id="childrenList"></div>
+      <hr class="div">
+      <button id="submitBtn" class="btn btn-primary" onclick="submitTxn()">Submit Check-In</button>
+      <button class="btn btn-muted" onclick="resetPortal()">Clear</button>
+      <div id="submitStatus" class="status"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ===================================================
+     PAGE 2 - REGISTER DELEGATE
+=================================================== -->
+<div id="page-delegate" class="page">
+  <div class="wrap">
+    <div class="page-hero">
+      <h2>Register Delegate Pickup</h2>
+      <p>Authorise a trusted person to collect a child. A unique delegate code is issued and emailed to the parent.</p>
+    </div>
+    <div class="card">
+      <h2>Step 1 - Verify Parent</h2>
+      <label>Parent Code</label>
+      <input id="delParentCode" placeholder="e.g. ABC-00001" autocomplete="off" autocapitalize="characters" inputmode="text">
+      <button class="btn btn-primary" onclick="loadParentForDelegate()">Verify Parent</button>
+      <div id="delLookupStatus" class="status"></div>
+    </div>
+    <div class="card" id="delStep2" style="display:none;">
+      <h2>Step 2 - Delegate Details</h2>
+      <div class="identity-bar parent-bar" id="delParentBar">
+        <img id="delParentPhoto" src="" alt="Parent">
+        <div class="id-info">
+          <strong id="delParentName">-</strong>
+          <span id="delParentMeta"></span>
+          <span class="badge badge-gold">Verified Parent</span>
+        </div>
+      </div>
+      <hr class="div">
+      <div class="grid2">
+        <div>
+          <label>Delegate Full Name</label>
+          <input id="delName" placeholder="Full name">
+        </div>
+        <div>
+          <label>Delegate Phone</label>
+          <input id="delPhone" placeholder="e.g. 0241234567" type="tel" inputmode="tel" autocomplete="tel">
+        </div>
+      </div>
+      <label>Delegate Photo <span style="font-weight:400;color:var(--muted)">(optional)</span></label>
+      <div class="photo-upload-wrap">
+        <img id="delPhotoPreview" class="photo-preview" src="" alt="Delegate photo">
+        <div>
+          <label class="photo-upload-btn" id="delPhotoBtn" for="delPhotoInput">Upload Photo</label>
+          <input class="photo-upload-input" type="file" id="delPhotoInput" accept="image/*"
+            onchange="handlePhotoUpload(this,'delPhotoPreview','delPhotoBtn','delPhotoData')">
+          <input type="hidden" id="delPhotoData" value="">
+          <div class="photo-size-note">JPG/PNG/WEBP - auto-compressed</div>
+        </div>
+      </div>
+      <label>Notes (optional)</label>
+      <input id="delNotes" placeholder="Relationship, occasion, etc.">
+      <h3>Authorise to Collect</h3>
+      <div id="delChildrenList"></div>
+      <hr class="div">
+      <button class="btn btn-gold" onclick="submitDelegate()">Generate Delegate Code</button>
+      <button class="btn btn-muted" onclick="resetDelegate()">Clear</button>
+      <div id="delSubmitStatus" class="status"></div>
+      <div id="delegateCodeDisplay" style="display:none;">
+        <div class="code-display">
+          <div class="code-label">Delegate Pickup Code</div>
+          <div class="code-value" id="generatedDelegateCode">-</div>
+          <div class="code-sub">Share with delegate. Parent has received this by email.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===================================================
+     PAGE 3 - REGISTER FAMILY
+=================================================== -->
+<div id="page-register" class="page">
+  <div class="wrap">
+    <div class="page-hero">
+      <h2>Register New Family</h2>
+      <p>Submit your details. Your Parent Code will be issued after admin approval - usually within 24 hours.</p>
+    </div>
+    <div class="card">
+      <h2>Parent Details</h2>
+      <div class="grid2">
+        <div>
+          <label>Full Name *</label>
+          <input id="regParentName" placeholder="e.g. Ransford Mensah">
+        </div>
+        <div>
+          <label>Phone Number *</label>
+          <input id="regPhone" placeholder="e.g. 0244358113" type="tel" inputmode="tel" autocomplete="tel">
+        </div>
+      </div>
+      <div class="grid2">
+        <div>
+          <label>Email Address</label>
+          <input id="regEmail" placeholder="e.g. name@gmail.com" type="email" inputmode="email" autocomplete="email">
+        </div>
+        <div>
+          <label>Relationship to Child</label>
+          <select id="regRelationship">
+            <option value="Parent">Parent</option>
+            <option value="Guardian">Guardian</option>
+            <option value="Grandparent">Grandparent</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+      </div>
+      <label>Parent Photo <span style="font-weight:400;color:var(--muted)">(optional)</span></label>
+      <div class="photo-upload-wrap">
+        <img id="regParentPhotoPreview" class="photo-preview" src="" alt="Parent photo">
+        <div>
+          <label class="photo-upload-btn" id="regParentPhotoBtn" for="regParentPhotoInput">Upload Photo</label>
+          <input class="photo-upload-input" type="file" id="regParentPhotoInput" accept="image/*"
+            onchange="handlePhotoUpload(this,'regParentPhotoPreview','regParentPhotoBtn','regParentPhotoData')">
+          <input type="hidden" id="regParentPhotoData" value="">
+          <div class="photo-size-note">JPG/PNG/WEBP - max 2MB, auto-compressed</div>
+        </div>
+      </div>
+      <h3>Alternate Pickup (optional)</h3>
+      <div class="grid2">
+        <div><label>Name</label><input id="regAltName" placeholder="Full name"></div>
+        <div><label>Phone</label><input id="regAltPhone" placeholder="Phone" type="tel"></div>
+      </div>
+      <label>Notes (optional)</label>
+      <input id="regNotes" placeholder="Any notes for the admin">
+    </div>
+    <div class="card">
+      <h2>Children</h2>
+      <p style="font-size:12px;color:var(--muted);margin-bottom:12px;">Add at least one child. Up to 6.</p>
+      <div id="regChildrenContainer"></div>
+      <button class="btn btn-outline" onclick="addChildRow()" style="margin-top:8px;">+ Add Another Child</button>
+    </div>
+    <div class="card">
+      <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-weight:400;">
+        <input type="checkbox" id="regConsent" checked style="width:18px;height:18px;accent-color:var(--brand);flex-shrink:0;">
+        <span style="font-size:12px;">I consent to photo storage and attendance tracking as part of the Children Service.</span>
+      </label>
+      <button class="btn btn-gold" onclick="submitRegistration()" style="margin-top:14px;">Submit Registration</button>
+      <button class="btn btn-muted" onclick="resetRegistration()">Clear Form</button>
+      <div id="regStatus" class="status"></div>
+      <div id="regCodeDisplay" style="display:none;">
+        <div class="code-display">
+          <div class="code-label">Registration Submitted - Pending Approval</div>
+          <div class="code-value" style="font-size:16px;letter-spacing:1px;" id="regConfirmMsg">-</div>
+          <div class="code-sub" id="regCodeSub"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===================================================
+     PAGE 4 - ADMIN APPROVAL
+=================================================== -->
+<div id="page-admin" class="page">
+  <div class="wrap">
+    <div class="page-hero">
+      <h2>Admin - Approval Queue</h2>
+      <p>Review and approve or reject pending family registrations.</p>
+    </div>
+
+    <!-- PIN Gate -->
+    <div class="card" id="adminPinGate">
+      <div class="pin-gate">
+        <h2>Admin Access</h2>
+        <p>Enter your 4-digit admin PIN to continue.</p>
+        <input class="pin-input" id="adminPinInput" type="password" maxlength="4" autocomplete="off"
+          placeholder="----" inputmode="numeric" onkeyup="if(event.key==='Enter') verifyAdminPin()">
+        <button class="btn btn-primary" style="width:180px;margin:0 auto;" onclick="verifyAdminPin()">Enter</button>
+        <div id="pinStatus" class="status" style="text-align:left;"></div>
+      </div>
+    </div>
+
+    <!-- Queue (hidden until PIN verified) -->
+    <div id="adminQueue" style="display:none;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+        <span id="queueCount" style="font-size:13px;color:var(--muted);font-weight:600;"></span>
+        <button class="btn btn-muted" style="width:auto;padding:7px 14px;margin:0;font-size:12px;" onclick="loadQueue()">Refresh</button>
+      </div>
+      <div id="queueList"></div>
+    </div>
+
+  </div>
+</div>
+
+<footer class="df-production-footer">
+  <strong>Dataformatic Production</strong> &copy; 2026 | Kiddie Log Attendance System | Built for mobile church operations
+</footer>
+
+<!-- ===================================================
+     SCRIPT
+=================================================== -->
+<script>
+  /* -- State -- */
+  let currentParent = null, currentChildren = [], currentDelegate = null, currentMode = 'CHECK_IN';
+  let delParent = null, delChildren = [];
+  let regChildCount = 0;
+  let adminUnlocked = false;
+  let correctPin = '8113'; // overridden by getAppConfig
+
+  /* -- Branding on load -- */
+  google.script.run
+    .withSuccessHandler(cfg => {
+      document.documentElement.style.setProperty('--brand', cfg.brandColour || '#8b1a1a');
+      document.getElementById('headerChurchName').textContent  = cfg.churchName;
+      document.getElementById('headerServiceName').textContent = cfg.serviceName;
+      if (cfg.logoUrl) {
+        const img = document.getElementById('logoImg');
+        img.src = cfg.logoUrl; img.style.display = 'block';
+      }
+      document.title = cfg.churchName + ' - Kiddie Log';
+      correctPin = String(cfg.adminPin || '8113');
+    })
+    .withFailureHandler(() => {})
+    .getAppConfig();
+
+  /* -- Tab nav -- */
+  function showPage(name, btn) {
+    const activeButton = btn && btn.closest ? btn.closest('.tab-btn') : btn;
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.tab-bar .tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('page-' + name).classList.add('active');
+    if (activeButton) activeButton.classList.add('active');
+    document.querySelectorAll('.tab-bar .tab-btn').forEach(b => b.setAttribute('aria-current', b.classList.contains('active') ? 'page' : 'false'));
+    if (navigator.vibrate) navigator.vibrate(12);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  /* -- Helpers -- */
+  function setStatus(id, msg, type) { const el = document.getElementById(id); el.className = 'status s-' + type; el.textContent = msg; }
+  function clearStatus(id) { const el = document.getElementById(id); el.className = 'status'; el.textContent = ''; }
+
+  /* ============ CHECK-IN / OUT ============ */
+  function lookup() {
+    const code = document.getElementById('codeInput').value.trim();
+    currentMode = document.getElementById('mode').value;
+    if (!code) { setStatus('lookupStatus', 'Please enter a code.', 'error'); return; }
+    document.getElementById('resultCard').style.display = 'none';
+    setStatus('lookupStatus', 'Verifying...', 'info');
+    google.script.run
+      .withSuccessHandler(renderLookup)
+      .withFailureHandler(err => setStatus('lookupStatus', err.message, 'error'))
+      .lookupParent({ parentCode: code, mode: currentMode });
+  }
+
+  function renderLookup(res) {
+    if (!res.ok) { setStatus('lookupStatus', res.message, 'error'); return; }
+    currentParent = res.parent; currentChildren = res.children || []; currentDelegate = res.delegate || null;
+    setStatus('lookupStatus', 'Verified. Complete the form below.', 'ok');
+    document.getElementById('parentPhoto').src = currentParent.photoUrl || '';
+    document.getElementById('parentName').textContent = currentParent.parentName + '  |  ' + currentParent.parentCode;
+    document.getElementById('parentMeta').textContent = 'Phone: ' + (currentParent.phone || 'N/A') + (currentParent.email ? '  |  ' + currentParent.email : '');
+    const delBar = document.getElementById('delegateBar');
+    if (currentDelegate) {
+      document.getElementById('delegatePhoto').src = currentDelegate.photoUrl || '';
+      document.getElementById('delegateName').textContent = currentDelegate.delegateName + '  |  ' + currentDelegate.delegateCode;
+      document.getElementById('delegateMeta').textContent = 'Phone: ' + (currentDelegate.phone || 'N/A');
+      delBar.style.display = 'flex';
+      document.getElementById('pickupPerson').value = currentDelegate.delegateName;
+    } else { delBar.style.display = 'none'; }
+    const list = document.getElementById('childrenList');
+    list.innerHTML = '';
+    if (!currentChildren.length) {
+      list.innerHTML = '<p style="color:var(--danger);font-size:13px;">No eligible children found for this transaction.</p>';
+    } else {
+      currentChildren.forEach(child => {
+        const row = document.createElement('div'); row.className = 'child-row';
+        row.innerHTML = '<input type="checkbox" value="' + child.childId + '" checked>' +
+          '<img src="' + child.photoUrl + '" alt="' + child.childName + '">' +
+          '<div class="cinfo"><strong>' + child.childName + '</strong><span class="cid">' + child.childId + '</span>' +
+          '<small>Age: ' + (child.age||'N/A') + '  |  Group: ' + (child.group||'N/A') + '</small>' +
+          (child.medicalNote ? '<small style="color:#8b1a1a;">Medical: ' + child.medicalNote + '</small>' : '') + '</div>';
+        list.appendChild(row);
+      });
+    }
+    const btn = document.getElementById('submitBtn');
+    btn.className = currentMode === 'CHECK_OUT' ? 'btn btn-danger' : 'btn btn-primary';
+    btn.textContent = currentMode === 'CHECK_OUT' ? 'Submit Pickup / Check-Out' : 'Submit Drop Off / Check-In';
+    document.getElementById('resultCard').style.display = 'block';
+    clearStatus('submitStatus');
+    setTimeout(() => document.getElementById('resultCard').scrollIntoView({ behavior: 'smooth' }), 80);
+  }
+
+  function submitTxn() {
+    const selected = Array.from(document.querySelectorAll('#childrenList input[type="checkbox"]:checked')).map(cb => cb.value);
+    if (!selected.length) { setStatus('submitStatus', 'Select at least one child.', 'error'); return; }
+    setStatus('submitStatus', 'Submitting...', 'info');
+    google.script.run
+      .withSuccessHandler(res => { setStatus('submitStatus', res.message + '\nTransaction ID: ' + res.transactionId + '\nChildren: ' + res.count, 'ok'); document.getElementById('submitStatus').scrollIntoView({ behavior: 'smooth' }); })
+      .withFailureHandler(err => setStatus('submitStatus', err.message, 'error'))
+      .submitTransaction({ action: currentMode, parentCode: currentParent.parentCode, delegateCode: currentDelegate ? currentDelegate.delegateCode : '', selectedChildIds: selected, submittedBy: document.getElementById('submittedBy').value.trim(), pickupPerson: document.getElementById('pickupPerson').value.trim(), notes: document.getElementById('notes').value.trim() });
+  }
+
+  function resetPortal() {
+    ['codeInput','submittedBy','pickupPerson','notes'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('resultCard').style.display = 'none';
+    clearStatus('lookupStatus'); clearStatus('submitStatus');
+    currentParent = null; currentChildren = []; currentDelegate = null;
+  }
+
+  /* ============ DELEGATE ============ */
+  function loadParentForDelegate() {
+    const code = document.getElementById('delParentCode').value.trim();
+    if (!code) { setStatus('delLookupStatus', 'Enter a parent code.', 'error'); return; }
+    setStatus('delLookupStatus', 'Verifying...', 'info');
+    google.script.run
+      .withSuccessHandler(res => {
+        if (!res.ok) { setStatus('delLookupStatus', res.message, 'error'); return; }
+        delParent = res.parent; delChildren = res.children || [];
+        document.getElementById('delParentPhoto').src = delParent.photoUrl || '';
+        document.getElementById('delParentName').textContent = delParent.parentName + '  |  ' + delParent.parentCode;
+        document.getElementById('delParentMeta').textContent = 'Phone: ' + (delParent.phone || 'N/A') + (delParent.email ? '  |  ' + delParent.email : '');
+        const list = document.getElementById('delChildrenList'); list.innerHTML = '';
+        delChildren.forEach(child => {
+          const row = document.createElement('div'); row.className = 'child-select-row';
+          row.innerHTML = '<input type="checkbox" value="' + child.childId + '" checked>' +
+            '<img src="' + child.photoUrl + '" alt="' + child.childName + '">' +
+            '<div><div class="csname">' + child.childName + '</div><div class="csid">' + child.childId + '</div></div>';
+          list.appendChild(row);
+        });
+        document.getElementById('delStep2').style.display = 'block';
+        setStatus('delLookupStatus', 'Parent verified.', 'ok');
+        document.getElementById('delStep2').scrollIntoView({ behavior: 'smooth' });
+      })
+      .withFailureHandler(err => setStatus('delLookupStatus', err.message, 'error'))
+      .lookupParent({ parentCode: code, mode: 'CHECK_IN' });
+  }
+
+  function submitDelegate() {
+    const delegateName = document.getElementById('delName').value.trim();
+    const phone        = document.getElementById('delPhone').value.trim();
+    const photoUrl     = document.getElementById('delPhotoData').value || '';
+    const notes        = document.getElementById('delNotes').value.trim();
+    const authorisedIds = Array.from(document.querySelectorAll('#delChildrenList input[type="checkbox"]:checked')).map(cb => cb.value);
+    if (!delegateName)          { setStatus('delSubmitStatus', 'Delegate name is required.', 'error'); return; }
+    if (!authorisedIds.length)  { setStatus('delSubmitStatus', 'Select at least one child.', 'error'); return; }
+    setStatus('delSubmitStatus', 'Generating delegate code...', 'info');
+    document.getElementById('delegateCodeDisplay').style.display = 'none';
+    google.script.run
+      .withSuccessHandler(res => {
+        if (!res.ok) { setStatus('delSubmitStatus', res.message || 'Error.', 'error'); return; }
+        setStatus('delSubmitStatus', res.message, 'ok');
+        document.getElementById('generatedDelegateCode').textContent = res.delegateCode;
+        document.getElementById('delegateCodeDisplay').style.display = 'block';
+        document.getElementById('delegateCodeDisplay').scrollIntoView({ behavior: 'smooth' });
+      })
+      .withFailureHandler(err => setStatus('delSubmitStatus', err.message, 'error'))
+      .registerDelegate({ parentCode: delParent.parentCode, delegateName, phone, photoUrl, notes, authorisedIds });
+  }
+
+  function resetDelegate() {
+    ['delParentCode','delName','delPhone','delNotes'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('delPhotoData').value = '';
+    document.getElementById('delPhotoPreview').src = '';
+    document.getElementById('delPhotoPreview').classList.remove('has-photo');
+    document.getElementById('delPhotoBtn').classList.remove('uploaded');
+    document.getElementById('delPhotoBtn').innerHTML = 'Upload Photo';
+    document.getElementById('delStep2').style.display = 'none';
+    document.getElementById('delegateCodeDisplay').style.display = 'none';
+    clearStatus('delLookupStatus'); clearStatus('delSubmitStatus');
+    delParent = null; delChildren = [];
+  }
+
+  /* ============ REGISTER FAMILY ============ */
+  function addChildRow() {
+    if (regChildCount >= 6) return;
+    regChildCount++;
+    const n = regChildCount;
+    const container = document.getElementById('regChildrenContainer');
+    const div = document.createElement('div');
+    div.className = 'card'; div.id = 'regChild_' + n;
+    div.style.cssText = 'margin-bottom:10px;padding:14px 16px;border:1px solid var(--border);box-shadow:none;';
+    div.innerHTML =
+      '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">' +
+        '<strong style="font-size:13px;">Child ' + n + '</strong>' +
+        (n > 1 ? '<button onclick="removeChildRow(' + n + ')" style="background:none;border:none;color:var(--danger);cursor:pointer;font-size:12px;font-weight:700;width:auto;padding:0;margin:0;">x Remove</button>' : '') +
+      '</div>' +
+      '<div class="grid2">' +
+        '<div><label>Full Name *</label><input id="rc_name_' + n + '" placeholder="Child\'s full name"></div>' +
+        '<div><label>Age</label><input id="rc_age_' + n + '" type="number" min="0" max="17" placeholder="e.g. 7"></div>' +
+      '</div>' +
+      '<div class="grid2">' +
+        '<div><label>Gender</label><select id="rc_gender_' + n + '"><option value="">- Select -</option><option>Male</option><option>Female</option></select></div>' +
+        '<div><label>Group / Class</label><input id="rc_group_' + n + '" placeholder="e.g. Nursery" value="Children Church"></div>' +
+      '</div>' +
+      '<div class="grid2">' +
+        '<div><label>Medical Note <span style="font-weight:400;color:var(--muted)">(opt)</span></label><input id="rc_medical_' + n + '" placeholder="Allergies, etc."></div>' +
+        '<div><label>Child Photo <span style="font-weight:400;color:var(--muted)">(opt)</span></label>' +
+          '<div class="photo-upload-wrap">' +
+            '<img id="rc_photo_prev_' + n + '" class="photo-preview" src="" alt="Child photo">' +
+            '<div>' +
+              '<label class="photo-upload-btn" id="rc_photo_btn_' + n + '" for="rc_photo_input_' + n + '">Upload</label>' +
+              '<input class="photo-upload-input" type="file" id="rc_photo_input_' + n + '" accept="image/*" ' +
+                'onchange="handlePhotoUpload(this,\'rc_photo_prev_' + n + '\',\'rc_photo_btn_' + n + '\',\'rc_photo_data_' + n + '\')">' +
+              '<input type="hidden" id="rc_photo_data_' + n + '" value="">' +
+            '</div>' +
+          '</div>' +
+        '</div>' +
+      '</div>';
+    container.appendChild(div);
+  }
+
+  function removeChildRow(n) { const el = document.getElementById('regChild_' + n); if (el) { el.remove(); regChildCount--; } }
+
+  function collectChildren_() {
+    const children = [];
+    document.querySelectorAll('#regChildrenContainer .card').forEach(card => {
+      const id = card.id.replace('regChild_', '');
+      const name = (document.getElementById('rc_name_' + id) || {}).value || '';
+      if (!name.trim()) return;
+      children.push({ childName: name.trim(), age: (document.getElementById('rc_age_'+id)||{}).value||'', gender: (document.getElementById('rc_gender_'+id)||{}).value||'', group: (document.getElementById('rc_group_'+id)||{}).value||'', medicalNote: (document.getElementById('rc_medical_'+id)||{}).value||'', photoUrl: (document.getElementById('rc_photo_data_'+id)||{}).value||'' });
+    });
+    return children;
+  }
+
+  function submitRegistration() {
+    const parentName = document.getElementById('regParentName').value.trim();
+    const phone      = document.getElementById('regPhone').value.trim();
+    const email      = document.getElementById('regEmail').value.trim();
+    const children   = collectChildren_();
+    if (!parentName) { setStatus('regStatus', 'Parent name is required.', 'error'); return; }
+    if (!phone)      { setStatus('regStatus', 'Phone number is required.', 'error'); return; }
+    if (!children.length) { setStatus('regStatus', 'Add at least one child.', 'error'); return; }
+    setStatus('regStatus', 'Submitting registration...', 'info');
+    document.getElementById('regCodeDisplay').style.display = 'none';
+    google.script.run
+      .withSuccessHandler(parentCode => {
+        setStatus('regStatus', 'Registration submitted successfully!', 'ok');
+        document.getElementById('regConfirmMsg').textContent = 'Thank you, ' + parentName + '!';
+        document.getElementById('regCodeSub').textContent =
+          'Your registration is pending admin approval. ' +
+          (email ? 'A welcome email has been sent to ' + email + '.' : 'Please check back with your children\'s service leader.') +
+          ' You will receive your Parent Code once approved.';
+        document.getElementById('regCodeDisplay').style.display = 'block';
+        document.getElementById('regCodeDisplay').scrollIntoView({ behavior: 'smooth' });
+      })
+      .withFailureHandler(err => setStatus('regStatus', err.message, 'error'))
+      .registerParentAndChildren({ parentName, phone, email, altPickupName: document.getElementById('regAltName').value.trim(), altPickupPhone: document.getElementById('regAltPhone').value.trim(), relationship: document.getElementById('regRelationship').value, notes: document.getElementById('regNotes').value.trim(), photoUrl: document.getElementById('regParentPhotoData').value || '', consent: document.getElementById('regConsent').checked ? 'YES' : 'NO' }, children);
+  }
+
+  function resetRegistration() {
+    ['regParentName','regPhone','regEmail','regAltName','regAltPhone','regNotes'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('regRelationship').value = 'Parent';
+    document.getElementById('regConsent').checked = true;
+    document.getElementById('regParentPhotoData').value = '';
+    document.getElementById('regParentPhotoPreview').src = '';
+    document.getElementById('regParentPhotoPreview').classList.remove('has-photo');
+    document.getElementById('regParentPhotoBtn').classList.remove('uploaded');
+    document.getElementById('regParentPhotoBtn').innerHTML = ' Upload Photo';
+    document.getElementById('regChildrenContainer').innerHTML = '';
+    document.getElementById('regCodeDisplay').style.display = 'none';
+    regChildCount = 0; clearStatus('regStatus'); addChildRow();
+  }
+
+  /* ============ ADMIN ============ */
+  function verifyAdminPin() {
+    const entered = document.getElementById('adminPinInput').value.trim();
+    if (entered === correctPin) {
+      adminUnlocked = true;
+      document.getElementById('adminPinGate').style.display = 'none';
+      document.getElementById('adminQueue').style.display = 'block';
+      loadQueue();
+    } else {
+      setStatus('pinStatus', 'Incorrect PIN. Please try again.', 'error');
+      document.getElementById('adminPinInput').value = '';
+    }
+  }
+
+  function loadQueue() {
+    document.getElementById('queueList').innerHTML = '<p style="color:var(--muted);font-size:13px;padding:10px 0;">Loading queue...</p>';
+    google.script.run
+      .withSuccessHandler(renderQueue)
+      .withFailureHandler(err => { document.getElementById('queueList').innerHTML = '<p style="color:var(--danger);">' + err.message + '</p>'; })
+      .getPendingRegistrations();
+  }
+
+  function renderQueue(list) {
+    const container = document.getElementById('queueList');
+    const countEl   = document.getElementById('queueCount');
+    container.innerHTML = '';
+
+    if (!list.length) {
+      countEl.textContent = '0 pending registrations';
+      container.innerHTML =
+        '<div class="empty-state"><div class="empty-icon"></div><p>No pending registrations. All caught up!</p></div>';
+      return;
+    }
+
+    countEl.textContent = list.length + ' pending registration' + (list.length > 1 ? 's' : '');
+
+    list.forEach(reg => {
+      const card = document.createElement('div');
+      card.className = 'queue-card';
+      card.id = 'qcard_' + reg.parentCode;
+
+      const childRows = (reg.children || []).map(c =>
+        '<div class="qchild"><img src="' + c.photoUrl + '" alt="' + c.childName + '">' +
+        '<span><strong>' + c.childName + '</strong> - Age: ' + (c.age||'N/A') + ', ' + (c.group||'') + '</span></div>'
+      ).join('');
+
+      card.innerHTML =
+        '<div class="qhead">' +
+          '<img src="' + reg.photoUrl + '" alt="' + reg.parentName + '">' +
+          '<div class="qinfo">' +
+            '<strong>' + reg.parentName + '</strong>' +
+            '<span>' + reg.parentCode + '  |  ' + (reg.phone||'N/A') + '</span>' +
+            '<span>' + (reg.email||'No email') + '</span>' +
+            '<span style="font-size:11px;color:var(--muted);">Registered: ' + reg.registeredAt + '</span>' +
+          '</div>' +
+        '</div>' +
+        '<div class="qchildren">' + childRows + '</div>' +
+        (reg.notes ? '<p style="font-size:12px;color:var(--muted);margin-bottom:10px;">Note: ' + reg.notes + '</p>' : '') +
+        '<div class="queue-actions">' +
+          '<button class="btn btn-gold" onclick="approveReg(\'' + reg.parentCode + '\')"> Approve</button>' +
+          '<button class="btn btn-danger" onclick="rejectReg(\'' + reg.parentCode + '\')"> Reject</button>' +
+        '</div>' +
+        '<div id="qstatus_' + reg.parentCode + '" class="status"></div>';
+
+      container.appendChild(card);
+    });
+  }
+
+  function approveReg(parentCode) {
+    setStatus('qstatus_' + parentCode, 'Approving...', 'info');
+    google.script.run
+      .withSuccessHandler(res => {
+        setStatus('qstatus_' + parentCode, res.message, res.ok ? 'ok' : 'error');
+        if (res.ok) {
+          setTimeout(() => {
+            const card = document.getElementById('qcard_' + parentCode);
+            if (card) card.style.opacity = '0.4';
+            setTimeout(loadQueue, 1200);
+          }, 800);
+        }
+      })
+      .withFailureHandler(err => setStatus('qstatus_' + parentCode, err.message, 'error'))
+      .approveRegistration(parentCode);
+  }
+
+  function rejectReg(parentCode) {
+    const reason = prompt('Optional: enter a reason for rejection (shown in email to parent)') || '';
+    setStatus('qstatus_' + parentCode, 'Rejecting...', 'info');
+    google.script.run
+      .withSuccessHandler(res => {
+        setStatus('qstatus_' + parentCode, res.message, res.ok ? 'ok' : 'error');
+        if (res.ok) setTimeout(loadQueue, 1500);
+      })
+      .withFailureHandler(err => setStatus('qstatus_' + parentCode, err.message, 'error'))
+      .rejectRegistration(parentCode, reason);
+  }
+
+  /* ============ PHOTO UPLOAD ENGINE ============ */
+  function handlePhotoUpload(input, previewId, btnId, dataId) {
+    const file = input.files[0];
+    if (!file) return;
+    if (file.size > 2 * 1024 * 1024) { alert('Photo is too large. Please choose an image under 2MB.'); input.value = ''; return; }
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      const img = new Image();
+      img.onload = function() {
+        const MAX_DIM = 300, MAX_BYTES = 200 * 1024;
+        let w = img.width, h = img.height;
+        if (w > MAX_DIM || h > MAX_DIM) {
+          if (w > h) { h = Math.round(h * MAX_DIM / w); w = MAX_DIM; }
+          else       { w = Math.round(w * MAX_DIM / h); h = MAX_DIM; }
+        }
+        const canvas = document.createElement('canvas');
+        canvas.width = w; canvas.height = h;
+        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+        let quality = 0.85, dataUrl = canvas.toDataURL('image/jpeg', quality);
+        while (dataUrl.length > MAX_BYTES * 1.37 && quality > 0.3) { quality -= 0.1; dataUrl = canvas.toDataURL('image/jpeg', quality); }
+        document.getElementById(dataId).value = dataUrl;
+        const preview = document.getElementById(previewId);
+        preview.src = dataUrl; preview.classList.add('has-photo');
+        const btn = document.getElementById(btnId);
+        btn.classList.add('uploaded'); btn.innerHTML = ' Photo Uploaded';
+      };
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  }
+
+  /* -- Init -- */
+  addChildRow();
+</script>
+</body>
+</html>

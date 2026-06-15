@@ -1,0 +1,34 @@
+[
+  {
+    "file": "01_GOOGLE_APPS_SCRIPT_REAL_APP/Code.gs",
+    "chars": 9193,
+    "mojibake": false,
+    "has_google_script_run": false,
+    "loads_Index": true,
+    "has_viewport": false
+  },
+  {
+    "file": "01_GOOGLE_APPS_SCRIPT_REAL_APP/Spreadsheets.gs",
+    "chars": 3554,
+    "mojibake": false,
+    "has_google_script_run": false,
+    "loads_Index": false,
+    "has_viewport": false
+  },
+  {
+    "file": "01_GOOGLE_APPS_SCRIPT_REAL_APP/Index.html",
+    "chars": 15511,
+    "mojibake": false,
+    "has_google_script_run": true,
+    "loads_Index": false,
+    "has_viewport": true
+  },
+  {
+    "file": "02_GITHUB_LAUNCHER_ONLY/launcher.html",
+    "chars": 1840,
+    "mojibake": false,
+    "has_google_script_run": false,
+    "loads_Index": false,
+    "has_viewport": true
+  }
+]
