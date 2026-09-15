@@ -1,7 +1,7 @@
 import React, { useEffect, useState, createContext, useContext } from 'react';
 import { createRoot } from 'react-dom/client';
 import { LayoutDashboard, Users, Baby, ClipboardCheck, ArrowLeftRight, BarChart3, UserRoundCog, Palette, MessageCircle, Settings, LogOut, Menu, X, ChevronDown, ShieldCheck, Home, History, UserRound, Heart, Bell } from 'lucide-react';
-import { api, base, navigate, tenantSlug } from './api';
+import { api, base, navigate, tenantSlug, deploymentPrefix, currentRoute, asset } from './api';
 import { Brand, Link, Loading, Notice, Button, Avatar } from './components';
 import { PlatformHome, Access, InstitutionRegister, Landing, Login, Registration, CollectorPortal } from './pages/public';
 import { ParentPages } from './pages/parent';
@@ -15,14 +15,14 @@ const navItems=[['/admin','Overview',LayoutDashboard,'reports'],['/staff/desk','
 const parentNav=[['/parent','Home',Home],['/parent/children','My children',Baby],['/parent/notifications','Notifications',Bell],['/parent/collectors','Trusted collectors',ShieldCheck],['/parent/activity','Attendance',History],['/parent/messages','Messages',MessageCircle],['/parent/profile','My profile',UserRound]];
 export const homeFor=u=>u.role==='Parent'?'/parent':u.role==='Check-in Officer'?'/staff/desk':u.role==='Registration Officer'?'/admin/approvals':u.role==='Communications Officer'?'/admin/messages':'/admin';
 function App(){
-  const [path,setPath]=useState(location.pathname.startsWith(base)?location.pathname.slice(base.length)||'/':'/');
+  const [path,setPath]=useState(currentRoute());
   const [state,setState]=useState(null),[tenant,setTenant]=useState(null),[loading,setLoading]=useState(true),[error,setError]=useState(''),[toast,setToast]=useState(''),[menu,setMenu]=useState(false);
-  useEffect(()=>{const listener=()=>{setPath(location.pathname.startsWith(base)?location.pathname.slice(base.length)||'/':location.pathname);setMenu(false);setError('');window.scrollTo(0,0);};addEventListener('popstate',listener);return()=>removeEventListener('popstate',listener);},[]);
+  useEffect(()=>{const listener=()=>{setPath(currentRoute());setMenu(false);setError('');window.scrollTo(0,0);};addEventListener('popstate',listener);return()=>removeEventListener('popstate',listener);},[]);
   const refresh=async()=>{const value=await api('/state');setState(value);setTenant(value.tenant);return value;};
   useEffect(()=>{if(!tenantSlug){setLoading(false);return;}api('/tenant').then(setTenant).catch(e=>setError(e.message));refresh().catch(e=>{if(e.status!==401)setError(e.message);}).finally(()=>setLoading(false));},[]);
   useEffect(()=>{if(toast){const t=setTimeout(()=>setToast(''),5000);return()=>clearTimeout(t);}},[toast]);
   useEffect(()=>{document.title='Kiddie Log · '+(tenant?.name||'Safe children. Stronger communities.');document.documentElement.dataset.accent=tenant?.accent||'forest';},[tenant]);
-  useEffect(()=>{const manifest=document.querySelector('link[rel="manifest"]');if(manifest)manifest.href=tenantSlug?`/t/${tenantSlug}/manifest.webmanifest`:'/manifest.webmanifest';if('serviceWorker'in navigator)navigator.serviceWorker.register('/sw.js').catch(()=>{});},[]);
+  useEffect(()=>{document.documentElement.style.setProperty('--hero-image',`url("${asset('/images/kiddie-log-hero.png')}")`);const manifest=document.querySelector('link[rel="manifest"]');if(manifest)manifest.href=location.hostname.endsWith('github.io')?`${deploymentPrefix}/manifest.webmanifest`:tenantSlug?`/t/${tenantSlug}/manifest.webmanifest`:'/manifest.webmanifest';if('serviceWorker'in navigator)navigator.serviceWorker.register(`${deploymentPrefix}/sw.js`).catch(()=>{});},[]);
   useEffect(()=>{if(!loading)document.querySelector('main h1')?.focus();},[path,loading]);
   const logout=async()=>{await api('/logout',{});setState(null);navigate('/');};
   const value={state,tenant,refresh,toast:setToast,path,logout};
