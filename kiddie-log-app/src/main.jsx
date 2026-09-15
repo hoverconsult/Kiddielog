@@ -1,0 +1,50 @@
+import React, { useEffect, useState, createContext, useContext } from 'react';
+import { createRoot } from 'react-dom/client';
+import { LayoutDashboard, Users, Baby, ClipboardCheck, ArrowLeftRight, BarChart3, UserRoundCog, Palette, MessageCircle, Settings, LogOut, Menu, X, ChevronDown, ShieldCheck, Home, History, UserRound, Heart, Bell } from 'lucide-react';
+import { api, base, navigate, tenantSlug } from './api';
+import { Brand, Link, Loading, Notice, Button, Avatar } from './components';
+import { PlatformHome, Access, InstitutionRegister, Landing, Login, Registration, CollectorPortal } from './pages/public';
+import { ParentPages } from './pages/parent';
+import { StaffPages } from './pages/staff';
+import { AdminPages } from './pages/admin';
+import './styles.css';
+
+const Context=createContext();
+export const useApp=()=>useContext(Context);
+const navItems=[['/admin','Overview',LayoutDashboard,'reports'],['/staff/desk','Check-in & pickup',ArrowLeftRight,'desk'],['/admin/children','Children & care',Baby,'directory'],['/admin/families','Families',Users,'directory'],['/admin/collectors','Trusted collectors',ShieldCheck,'directory'],['/admin/approvals','Approvals',ClipboardCheck,'review'],['/admin/transactions','Attendance ledger',History,'ledger'],['/admin/reports','Reports & insights',BarChart3,'reports'],['/admin/notifications','Announcements',Bell,'messages'],['/admin/messages','Family messages',MessageCircle,'messages'],['/admin/users','Users & roles',UserRoundCog,'users'],['/admin/branding','Branding',Palette,'branding'],['/admin/settings','Publication readiness',Settings,'users']];
+const parentNav=[['/parent','Home',Home],['/parent/children','My children',Baby],['/parent/notifications','Notifications',Bell],['/parent/collectors','Trusted collectors',ShieldCheck],['/parent/activity','Attendance',History],['/parent/messages','Messages',MessageCircle],['/parent/profile','My profile',UserRound]];
+export const homeFor=u=>u.role==='Parent'?'/parent':u.role==='Check-in Officer'?'/staff/desk':u.role==='Registration Officer'?'/admin/approvals':u.role==='Communications Officer'?'/admin/messages':'/admin';
+function App(){
+  const [path,setPath]=useState(location.pathname.startsWith(base)?location.pathname.slice(base.length)||'/':'/');
+  const [state,setState]=useState(null),[tenant,setTenant]=useState(null),[loading,setLoading]=useState(true),[error,setError]=useState(''),[toast,setToast]=useState(''),[menu,setMenu]=useState(false);
+  useEffect(()=>{const listener=()=>{setPath(location.pathname.startsWith(base)?location.pathname.slice(base.length)||'/':location.pathname);setMenu(false);setError('');window.scrollTo(0,0);};addEventListener('popstate',listener);return()=>removeEventListener('popstate',listener);},[]);
+  const refresh=async()=>{const value=await api('/state');setState(value);setTenant(value.tenant);return value;};
+  useEffect(()=>{if(!tenantSlug){setLoading(false);return;}api('/tenant').then(setTenant).catch(e=>setError(e.message));refresh().catch(e=>{if(e.status!==401)setError(e.message);}).finally(()=>setLoading(false));},[]);
+  useEffect(()=>{if(toast){const t=setTimeout(()=>setToast(''),5000);return()=>clearTimeout(t);}},[toast]);
+  useEffect(()=>{document.title='Kiddie Log · '+(tenant?.name||'Safe children. Stronger communities.');document.documentElement.dataset.accent=tenant?.accent||'forest';},[tenant]);
+  useEffect(()=>{const manifest=document.querySelector('link[rel="manifest"]');if(manifest)manifest.href=tenantSlug?`/t/${tenantSlug}/manifest.webmanifest`:'/manifest.webmanifest';if('serviceWorker'in navigator)navigator.serviceWorker.register('/sw.js').catch(()=>{});},[]);
+  useEffect(()=>{if(!loading)document.querySelector('main h1')?.focus();},[path,loading]);
+  const logout=async()=>{await api('/logout',{});setState(null);navigate('/');};
+  const value={state,tenant,refresh,toast:setToast,path,logout};
+  const protectedPath=path.startsWith('/parent')||path.startsWith('/admin')||path.startsWith('/staff/desk')||path.startsWith('/staff/pickups')||path.startsWith('/staff/transactions');
+  const useShell=protectedPath&&state;
+  const links=state?.user.role==='Parent'?parentNav:navItems.filter(n=>state?.permissions.includes(n[3]));
+  const active=to=>to==='/admin'||to==='/parent'?path===to:path.startsWith(to);
+  let page;
+  if(loading)page=<Loading/>;
+  else if(!tenantSlug&&path==='/')page=<PlatformHome/>;
+  else if(!tenantSlug&&path==='/access')page=<Access/>;
+  else if(!tenantSlug&&path==='/institution/register')page=<InstitutionRegister/>;
+  else if(protectedPath&&!state)page=<Login/>;
+  else if(path==='/')page=<Landing/>;
+  else if(path==='/login'||path==='/login/verify'||path==='/staff/login')page=<Login/>;
+  else if(path.startsWith('/register'))page=<Registration/>;
+  else if(path.startsWith('/collector'))page=<CollectorPortal/>;
+  else if(path.startsWith('/parent'))page=state.user.role==='Parent'?<ParentPages/>:<Notice tone="error">This is a parent-only area. <Link to={homeFor(state.user)}>Return to your workspace</Link></Notice>;
+  else if(path.startsWith('/staff'))page=state.permissions.includes('desk')?<StaffPages/>:<Notice tone="error">Only a Check-in Officer can complete a handover.</Notice>;
+  else if(path.startsWith('/admin'))page=state.user.role!=='Parent'?<AdminPages/>:<Notice tone="error">This area requires a team role.</Notice>;
+  else page=<Notice tone="error">Page not found. <Link to="/">Return home</Link></Notice>;
+  return <Context.Provider value={value}><a className="skip" href="#main">Skip to content</a>{useShell?<div className="app-shell"><aside className={'sidebar '+(menu?'open':'')}><div className="side-brand"><Brand/><button className="icon-button mobile-only" aria-label="Close navigation" onClick={()=>setMenu(false)}><X/></button></div><div className="institution"><span className="institution-logo">{tenant?.logo?<img src={tenant.logo} alt=""/>:<Heart size={22}/>}</span><div><strong>{tenant?.name}</strong><small>{tenant?.ministry}</small></div><ChevronDown size={15}/></div><p className="nav-caption">{state.user.role==='Parent'?'YOUR FAMILY':'YOUR WORKSPACE'}</p><nav aria-label="Main navigation">{links.map(([to,label,Icon])=><Link key={to} to={to} className={'nav-link '+(active(to)?'active':'')} aria-current={active(to)?'page':undefined}><Icon size={19}/><span>{label}</span>{to==='/admin/approvals'&&state.applications.filter(a=>a.status==='pending').length>0&&<b className="nav-count">{state.applications.filter(a=>a.status==='pending').length}</b>}{to==='/parent/notifications'&&state.notifications?.filter(n=>!n.read).length>0&&<b className="nav-count">{state.notifications.filter(n=>!n.read).length}</b>}</Link>)}</nav><div className="side-bottom"><div className="safety-mini"><ShieldCheck size={21}/><div><strong>Every child matters.</strong><small>Safe hands. Peace of mind.</small></div></div><span className="endorsement">Powered by <strong>Dataformatic</strong></span></div></aside>{menu&&<button className="scrim" aria-label="Close menu" onClick={()=>setMenu(false)}/>}<div className="workspace"><header className="topbar"><div className="row"><button className="icon-button mobile-only" aria-label="Open navigation" onClick={()=>setMenu(true)}><Menu/></button><span className="breadcrumb">{state.user.role==='Parent'?'Family portal':'Institution team'} <span>/</span> <strong>{links.find(n=>active(n[0]))?.[1]||'Workspace'}</strong></span></div><div className="top-actions"><div className="user-chip"><Avatar name={state.user.name}/><div><strong>{state.user.name}</strong><small>{state.user.role}</small></div></div><button className="icon-button" title="Sign out" aria-label="Sign out" onClick={()=>logout().catch(e=>setError(e.message))}><LogOut size={18}/></button></div></header><main id="main" className="main-content">{error&&<Notice tone="error">{error}</Notice>}{page}</main><footer className="workspace-footer"><span><ShieldCheck size={14}/> Protected institution workspace</span><span>Kiddie Log · Built around trust</span></footer></div></div>:<div className="public-shell"><header className="public-header"><Brand/><div className="row">{state?<Link to={homeFor(state.user)} className="button secondary">Open workspace</Link>:tenantSlug?<Link to="/login" className="button secondary">Sign in</Link>:<Link to="/access" className="button secondary">Find institution</Link>}</div></header><main id="main" className="public-main">{error&&<Notice tone="error">{error}</Notice>}{page}</main><footer className="public-footer"><span>Safe children. Stronger communities.</span><span>Powered by <strong>Dataformatic</strong></span></footer></div>}{toast&&<div className="toast" role="status"><ShieldCheck size={18}/>{toast}</div>}</Context.Provider>;
+}
+class ErrorBoundary extends React.Component{state={error:false};static getDerivedStateFromError(){return {error:true};}render(){return this.state.error?<div className="public-main"><Notice tone="error">Something went wrong. Reload to restore your saved workspace.</Notice><Button onClick={()=>location.reload()}>Reload</Button></div>:this.props.children;}}
+createRoot(document.getElementById('root')).render(<ErrorBoundary><App/></ErrorBoundary>);
